@@ -11,24 +11,23 @@
 int main(int argc, char* argv[])
 {
     if (argc != 3){
-    	printf ("Client must receive 2 parametrs \n");
-    	exit (1);}
+    	printf ("Client must receive 2 parametrs: <serverqueue> <message> \n");
+    	return 1;}
     	
     
     mqd_t mq1 = mq_open (argv[1], O_WRONLY);
     
     if (mq1 == -1){
     	perror ("Failed to open message queue"); 
-        exit(1);}
+        return 1;}
         
-    size_t len = strlen (argv[2]);
+    mq_send(mq1, argv[2], strlen(argv[2]), 0);
     
-    int i = mq_send(mq1, argv[2], len, 0);
-    
-    if (i == -1)
+    if (errno == -1)
     {
+    	mq_close (mq1);
     	perror ("Failed to send");
-    	exit(1);
+    	return 1;
     }
     
     return 0;
